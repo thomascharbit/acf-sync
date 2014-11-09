@@ -10,11 +10,11 @@ This was inspired from this [nice article](http://seanbutze.com/automated-export
 
 ### Installation
 
-- install this plugin along with ACF > 5.0.0 
+- install this plugin along with ACF > 5.0.0 `composer require freshflesh/acf-sync`
 - define a `ACF_FIELDS_VERSION` constant somewhere in your code. You might want to put this with your Custom Post Type definitions, for example : 
--- in a project core plugin
--- in a project config file
--- in your theme functions.php
+ - in a project core plugin
+ - in a project config file
+ - in your theme functions.php
 
 
 ### How does it work ?
@@ -29,9 +29,9 @@ When another developer of your team will fetch your changes and new JSON files, 
 
 Of course fields groups can also be synchronized between development and production environments.
 
-This plugin also optionnally let you use a WP_ENV constant to disable saving to JSON and hide the ACF UI on staging and production environment to avoid mistakes on non-development environments.
+This plugin also optionnally let you use a `WP_ENV` constant to disable saving to JSON and hide the ACF UI on staging and production environment to avoid mistakes on non-development environments.
 
-If you use the [Bedrock](http://roots.io/wordpress-stack/) WordPress stack, WP_ENV is already defined in the config, otherwise you can define it yourself in your wp-config.php.
+If you use the [Bedrock WordPress stack](http://roots.io/wordpress-stack/), `WP_ENV` is already defined in the config, otherwise you can define it yourself in your wp-config.php.
 
 
 ### Licence
