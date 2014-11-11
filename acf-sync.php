@@ -3,7 +3,7 @@
 Plugin Name: ACF Sync
 Plugin URI: https://github.com/FreshFlesh/ACF-Sync
 Description: Keep your ACF field groups synchronized between different environments
-Version: 1.0.0
+Version: 1.0.1
 Author: Thomas Charbit
 Author URI: https://twitter.com/thomascharbit
 Author Email: thomas.charbit@gmail.com
@@ -62,14 +62,19 @@ class ACFSync {
     
     public function check_acf_fields_version() {
 
-        if ( defined( 'ACF_FIELDS_VERSION' ) ) {
+        if ( defined( 'ACF_FIELDS_VERSION' ) && acf_get_setting('json') ) {
 
             $db_version = get_option( 'acf_fields_version' );
 
             // Import fields from local JSON if they are newer than in DB
             if ( version_compare( ACF_FIELDS_VERSION, $db_version ) > 0 ) {
-                $this->import_json_field_groups();
-                update_option( 'acf_fields_version', ACF_FIELDS_VERSION );
+
+                $success = $this->import_json_field_groups();
+
+                if ( $success ) {
+                    update_option( 'acf_fields_version', ACF_FIELDS_VERSION );
+                }
+
             }
 
         }
@@ -88,6 +93,15 @@ class ACFSync {
 
     private function import_json_field_groups() {
 
+        // Check if JSON paths are readable
+        $json_paths = acf_get_setting('load_json');
+
+        foreach ($json_paths as $json_path) {
+            if ( !is_readable( $json_path ) ) {
+                return false;
+            }
+        }
+
         // Tell ACF NOT to save to local JSON while we delete groups in DB
         add_filter('acf/settings/save_json', '__return_null', 99 );
 
@@ -104,9 +118,7 @@ class ACFSync {
             wp_delete_post( $acf_group->ID, true);
         }
 
-        // Find local JSON load points directories
-        $json_paths = acf_get_setting('load_json');
-
+        // Parse local JSON load points directories
         foreach ($json_paths as $json_path) {
 
             $dir = new DirectoryIterator( $json_path );
