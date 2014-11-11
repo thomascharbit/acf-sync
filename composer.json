@@ -1,6 +1,7 @@
 {
     "name": "freshflesh/acf-sync",
     "description": "Keep your ACF field groups synchronized between different environments",
+    "version": "1.0.1",
     "type" : "wordpress-plugin",
     "license": "MIT",
     "authors": [
