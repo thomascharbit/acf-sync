@@ -11,7 +11,8 @@ This was inspired from this [nice article](http://seanbutze.com/automated-export
 ### Installation
 
 - install this plugin along with ACF > 5.0.0 `composer require freshflesh/acf-sync`
-- define a `ACF_FIELDS_VERSION` constant somewhere in your code. You might want to put this with your Custom Post Type definitions, for example : 
+- define a `ACF_FIELDS_VERSION` constant somewhere in your code. It should contains your field groups version, following the [version_compare](http://php.net/manual/en/function.version-compare.php) php function format. Exemple : `define('ACF_FIELDS_VERSION', '1.0.0');`
+You might want to put this with your Custom Post Type definitions, for example : 
  - in a project core plugin
  - in a project config file
  - in your theme functions.php
