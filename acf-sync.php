@@ -136,6 +136,8 @@ class ACFSync {
 
         }
 
+        return true;
+
     }
 
 
