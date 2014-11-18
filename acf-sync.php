@@ -3,7 +3,7 @@
 Plugin Name: ACF Sync
 Plugin URI: https://github.com/FreshFlesh/ACF-Sync
 Description: Keep your ACF field groups synchronized between different environments
-Version: 1.0.1
+Version: 1.0.2
 Author: Thomas Charbit
 Author URI: https://twitter.com/thomascharbit
 Author Email: thomas.charbit@gmail.com
