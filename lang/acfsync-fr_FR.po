@@ -1,0 +1,43 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: acfsync\n"
+"POT-Creation-Date: 2014-11-19 19:40+0100\n"
+"PO-Revision-Date: 2014-11-19 20:04+0100\n"
+"Last-Translator: Thomas Charbit <thomas.charbit@gmail.com>\n"
+"Language-Team: \n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.10\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-KeywordsList: __;_e;esc_html__\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../acf-sync.php:173
+msgid "Field groups updated !"
+msgstr "Les groupes de champs ont été correctement importés !"
+
+#: ../acf-sync.php:176
+msgid ""
+"Sorry, unable to sync your field groups. Make sure you have the local JSON "
+"feature enabled and that your JSON folder is readable."
+msgstr ""
+"Désolé, impossible de synchroniser vos groupes de champs. Vérifiez que la "
+"fonctionnalité local JSON est activée et que le dossier JSON est accessible "
+"en lecture. "
+
+#: ../admin/views/json-import.php:4
+msgid "Import field groups from local JSON"
+msgstr "Importer les groupes de champs depuis local JSON"
+
+#: ../admin/views/json-import.php:7
+msgid "Import manually the field groups from your local JSON folder."
+msgstr ""
+"Importer manuellement les groupes de champs depuis le dossier de sauvegarde "
+"JSON."
+
+#: ../admin/views/json-import.php:14
+msgid "Sync field groups"
+msgstr "Synchroniser"

@@ -3,7 +3,7 @@
 Plugin Name: ACF Sync
 Plugin URI: https://github.com/FreshFlesh/ACF-Sync
 Description: Keep your ACF field groups synchronized between different environments
-Version: 1.0.2
+Version: 1.1.0
 Author: Thomas Charbit
 Author URI: https://twitter.com/thomascharbit
 Author Email: thomas.charbit@gmail.com
@@ -34,7 +34,7 @@ class ACFSync {
         add_action( 'admin_init', array( $this, 'check_acf_fields_version' ) );
 
         // Load plugin text domain
-        add_action( 'admin_init', array( $this, 'plugin_textdomain' ) );
+        add_action( 'init', array( $this, 'plugin_textdomain' ) );
         
         // Add Admin UI for manual sync
         add_action('admin_footer', array( $this, 'render_admin_view' ) );
@@ -62,13 +62,22 @@ class ACFSync {
     /**
      * Loads the plugin text domain for translation
      */
+
     public function plugin_textdomain() {
 
-        $domain = 'acf-sync';
+        $domain = 'acfsync';
         $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
 
         load_textdomain( $domain, WP_LANG_DIR.'/'.$domain.'/'.$domain.'-'.$locale.'.mo' );
-        load_plugin_textdomain( $domain, FALSE, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
+        
+        if ( false !== strpos( __FILE__, basename( WPMU_PLUGIN_DIR ) ) ) {
+            load_muplugin_textdomain( $domain, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
+        }
+        else {
+            load_plugin_textdomain( $domain, FALSE, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
+        }
+
+        
 
     } // end plugin_textdomain
 
@@ -79,13 +88,13 @@ class ACFSync {
 
 
     /*
-    *  check_acf_fields_version
-    *
-    *  Compare fields version and import newer version if needed
-    *
-    *  @param   n/a
-    *  @return  n/a
-    */
+     *  check_acf_fields_version
+     *
+     *  Compare fields version and import newer version if needed
+     *
+     *  @param   n/a
+     *  @return  n/a
+     */
     
     public function check_acf_fields_version() {
 
@@ -110,13 +119,13 @@ class ACFSync {
 
 
     /*
-    *  render_admin_view
-    *
-    *  Render admin form on ACF settings-export page
-    *
-    *  @param   n/a
-    *  @return  n/a
-    */
+     *  render_admin_view
+     *
+     *  Render admin form on ACF settings-export page
+     *
+     *  @param   n/a
+     *  @return  n/a
+     */
 
     public function render_admin_view() {
 
@@ -125,17 +134,17 @@ class ACFSync {
     }
 
     /*
-    *  manual_sync_action
-    *
-    *  Validate form data and import field groups
-    *
-    *  @param   n/a
-    *  @return  n/a
-    */
+     *  manual_sync_action
+     *
+     *  Validate form data and import field groups
+     *
+     *  @param   n/a
+     *  @return  n/a
+     */
 
     public function manual_sync_action() {
 
-        if ( ! wp_verify_nonce( $_POST[ '_acfnonce' ], 'acf-sync' ) ) {
+        if ( ! wp_verify_nonce( $_POST[ '_acfnonce' ], 'acfsync' ) ) {
             die( 'Invalid nonce.' );
         }
 
@@ -157,36 +166,36 @@ class ACFSync {
 
 
     /*
-    *  admin_notices
-    *
-    *  Display relevant admin notice after manual import 
-    *
-    *  @param   n/a
-    *  @return  n/a
-    */
+     *  admin_notices
+     *
+     *  Display relevant admin notice after manual import 
+     *
+     *  @param   n/a
+     *  @return  n/a
+     */
 
     public function admin_notices() {
 
         if ( !isset( $_GET['fields-sync']) ) return;
 
         if ( $_GET['fields-sync'] == true ) {
-            echo '<div class="updated"><p>' . esc_html__( 'Field groups updated !', 'acf-sync' ) . '</p></div>';
+            echo '<div class="updated"><p>' . esc_html__( 'Field groups updated !', 'acfsync' ) . '</p></div>';
         }
         else {
-            echo '<div class="error"><p>' . esc_html__( 'Sorry, unable to sync your field groups. Make sure you have the local JSON feature enabled and that your JSON folder is readable.', 'acf-sync' ) . '</p></div>';
+            echo '<div class="error"><p>' . esc_html__( 'Sorry, unable to sync your field groups. Make sure you have the local JSON feature enabled and that your JSON folder is readable.', 'acfsync' ) . '</p></div>';
         }
 
     }
 
 
     /*
-    *  import_json_field_groups
-    *
-    *  Parse json load points paths and import all JSON files
-    *
-    *  @param   n/a
-    *  @return  bool
-    */
+     *  import_json_field_groups
+     *
+     *  Parse json load points paths and import all JSON files
+     *
+     *  @param   n/a
+     *  @return  bool
+     */
 
     private function import_json_field_groups() {
 
@@ -239,13 +248,13 @@ class ACFSync {
 
 
     /*
-    *  import_json_field_group
-    *
-    * import ACF field group from JSON data
-    *
-    *  @param   $json (array)
-    *  @return  n/a
-    */
+     *  import_json_field_group
+     *
+     * import ACF field group from JSON data
+     *
+     *  @param   $json (array)
+     *  @return  n/a
+     */
 
     private function import_json_field_group( $json ) {
         
