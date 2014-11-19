@@ -27,25 +27,52 @@ class ACFSync {
      */
 
     function __construct() {
-       
-       // Sync fields on admin_init if needed
-        add_action('admin_init', array( $this, 'check_acf_fields_version' ) );
+        
+        if ( !acf_get_setting('json') ) return;
+
+        // Sync fields on admin_init if needed
+        add_action( 'admin_init', array( $this, 'check_acf_fields_version' ) );
+
+        // Load plugin text domain
+        add_action( 'admin_init', array( $this, 'plugin_textdomain' ) );
+        
+        // Add Admin UI for manual sync
+        add_action('admin_footer', array( $this, 'render_admin_view' ) );
+
+        // Handle Admin form
+        add_action( 'admin_post_acf-manual-sync', array( $this, 'manual_sync_action' ) );
+
+        // Admin notices
+        add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 
         // On prod or staging, let ACF simply read fields from JSON
         if ( defined( 'WP_ENV' ) && 'development' != WP_ENV ) {
 
             // Don't save fields to JSON
-            add_filter('acf/settings/save_json', '__return_null', 99 );
+            add_filter( 'acf/settings/save_json', '__return_null', 99 );
             
             // Don't show ACF UI
-            add_filter('acf/settings/show_admin', '__return_false');
+            add_filter( 'acf/settings/show_admin', '__return_false' );
         }
 
 
     } // end constructor
 
 
-    
+    /**
+     * Loads the plugin text domain for translation
+     */
+    public function plugin_textdomain() {
+
+        $domain = 'acf-sync';
+        $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
+
+        load_textdomain( $domain, WP_LANG_DIR.'/'.$domain.'/'.$domain.'-'.$locale.'.mo' );
+        load_plugin_textdomain( $domain, FALSE, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
+
+    } // end plugin_textdomain
+
+
     /*--------------------------------------------*
      * Core Functions
      *--------------------------------------------*/
@@ -62,7 +89,7 @@ class ACFSync {
     
     public function check_acf_fields_version() {
 
-        if ( defined( 'ACF_FIELDS_VERSION' ) && acf_get_setting('json') ) {
+        if ( defined( 'ACF_FIELDS_VERSION' ) ) {
 
             $db_version = get_option( 'acf_fields_version' );
 
@@ -83,12 +110,82 @@ class ACFSync {
 
 
     /*
+    *  render_admin_view
+    *
+    *  Render admin form on ACF settings-export page
+    *
+    *  @param   n/a
+    *  @return  n/a
+    */
+
+    public function render_admin_view() {
+
+        include( 'admin/views/json-import.php' );
+
+    }
+
+    /*
+    *  manual_sync_action
+    *
+    *  Validate form data and import field groups
+    *
+    *  @param   n/a
+    *  @return  n/a
+    */
+
+    public function manual_sync_action() {
+
+        if ( ! wp_verify_nonce( $_POST[ '_acfnonce' ], 'acf-sync' ) ) {
+            die( 'Invalid nonce.' );
+        }
+
+        $success = $this->import_json_field_groups();
+
+        if ( $success ) {
+            if ( defined( 'ACF_FIELDS_VERSION' ) ) {
+                update_option( 'acf_fields_version', ACF_FIELDS_VERSION );
+            }
+        }
+
+        $url = add_query_arg(  array( 'fields-sync' => $success ), $_SERVER['HTTP_REFERER'] );
+
+        wp_safe_redirect( $url );
+
+        exit;
+
+    }
+
+
+    /*
+    *  admin_notices
+    *
+    *  Display relevant admin notice after manual import 
+    *
+    *  @param   n/a
+    *  @return  n/a
+    */
+
+    public function admin_notices() {
+
+        if ( !isset( $_GET['fields-sync']) ) return;
+
+        if ( $_GET['fields-sync'] == true ) {
+            echo '<div class="updated"><p>' . esc_html__( 'Field groups updated !', 'acf-sync' ) . '</p></div>';
+        }
+        else {
+            echo '<div class="error"><p>' . esc_html__( 'Sorry, unable to sync your field groups. Make sure you have the local JSON feature enabled and that your JSON folder is readable.', 'acf-sync' ) . '</p></div>';
+        }
+
+    }
+
+
+    /*
     *  import_json_field_groups
     *
     *  Parse json load points paths and import all JSON files
     *
     *  @param   n/a
-    *  @return  n/a
+    *  @return  bool
     */
 
     private function import_json_field_groups() {
