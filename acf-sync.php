@@ -3,7 +3,7 @@
 Plugin Name: ACF Sync
 Plugin URI: https://github.com/FreshFlesh/ACF-Sync
 Description: Keep your ACF field groups synchronized between different environments
-Version: 1.1.0
+Version: 1.1.1
 Author: Thomas Charbit
 Author URI: https://twitter.com/thomascharbit
 Author Email: thomas.charbit@gmail.com
@@ -28,13 +28,11 @@ class ACFSync {
 
     function __construct() {
         
-        if ( !acf_get_setting('json') ) return;
-
         // Sync fields on admin_init if needed
         add_action( 'admin_init', array( $this, 'check_acf_fields_version' ) );
 
         // Load plugin text domain
-        add_action( 'init', array( $this, 'plugin_textdomain' ) );
+        add_action( 'admin_init', array( $this, 'plugin_textdomain' ) );
         
         // Add Admin UI for manual sync
         add_action('admin_footer', array( $this, 'render_admin_view' ) );
@@ -98,7 +96,7 @@ class ACFSync {
     
     public function check_acf_fields_version() {
 
-        if ( defined( 'ACF_FIELDS_VERSION' ) ) {
+        if ( defined( 'ACF_FIELDS_VERSION' ) && acf_get_setting('json') ) {
 
             $db_version = get_option( 'acf_fields_version' );
 
@@ -128,6 +126,8 @@ class ACFSync {
      */
 
     public function render_admin_view() {
+        
+        if ( !acf_get_setting('json') ) return;
 
         include( 'admin/views/json-import.php' );
 
@@ -198,6 +198,8 @@ class ACFSync {
      */
 
     private function import_json_field_groups() {
+
+        if ( !acf_get_setting('json') ) return false;
 
         // Check if JSON paths are readable
         $json_paths = acf_get_setting('load_json');
