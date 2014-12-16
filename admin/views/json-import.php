@@ -22,12 +22,10 @@
 <script type="text/javascript">
     (function($) {
 
-        $ACFWrapper = $('.acf-settings-wrap');
-
-        if ( $ACFWrapper.length <= 0 ) return false;
-
-        var html = $('#acf-sync-template').html();
-        $(html).appendTo( $ACFWrapper );
+        if ( $('body').hasClass('acf_page_acf-settings-export') ) {
+            var html = $('#acf-sync-template').html();
+            $(html).appendTo( $('.acf-settings-wrap') );
+        }
 
     })(jQuery); 
 </script>
